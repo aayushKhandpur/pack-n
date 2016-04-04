@@ -235,7 +235,7 @@ function acui_import_users( $file, $form_data, $attach_id = 0, $is_cron = false 
 										
 										if( empty( $data[ $i ] ) ){
 											if( $empty_cell_action == "delete" )
-												delete_post_meta( $user_id, $headers[ $i ] );
+												delete_user_meta( $user_id, $headers[ $i ] );
 											else
 												continue;	
 										}
@@ -296,17 +296,23 @@ function acui_import_users( $file, $form_data, $attach_id = 0, $is_cron = false 
 							$body_mail = str_replace("**" . $headers[ $i ] .  "**", $data[ $i ] , $body_mail);							
 						}
 
-						add_action( 'phpmailer_init', 'acui_mailer_init' );
-						add_filter( 'wp_mail_from', 'acui_mail_from' );
-						add_filter( 'wp_mail_from_name', 'acui_mail_from_name' );
 						add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-						
-						wp_mail( $email, $subject, $body_mail );
 
-						remove_filter( 'wp_mail_from', 'acui_mail_from' );
-						remove_filter( 'wp_mail_from_name', 'acui_mail_from_name' );
+						if( get_option( "acui_settings" ) == "plugin" ){
+							add_action( 'phpmailer_init', 'acui_mailer_init' );
+							add_filter( 'wp_mail_from', 'acui_mail_from' );
+							add_filter( 'wp_mail_from_name', 'acui_mail_from_name' );
+							
+							wp_mail( $email, $subject, $body_mail );
+
+							remove_filter( 'wp_mail_from', 'acui_mail_from' );
+							remove_filter( 'wp_mail_from_name', 'acui_mail_from_name' );
+							remove_action( 'phpmailer_init', 'acui_mailer_init' );
+						}
+						else
+							wp_mail( $email, $subject, $body_mail );
+
 						remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
-						remove_action( 'phpmailer_init', 'acui_mailer_init' );
 
 					endif;
 

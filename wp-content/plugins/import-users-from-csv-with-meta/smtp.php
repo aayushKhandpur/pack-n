@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 global $acui_smtp_options;
 $acui_smtp_options = array (
+	'acui_settings' => 'wordpress',
 	'acui_mail_from' => '',
 	'acui_mail_from_name' => '',
 	'acui_mailer' => 'smtp',
@@ -94,12 +95,38 @@ function acui_smtp() {
 		}
 
 	}
+
+	// in version 1.8.7 we include this new option, we fill it in a smart way
+	if( get_option( "acui_settings" ) == "" ){
+		if( get_option( "acui_mail_from" ) == "" )
+			update_option( "acui_settings", "wordpress" );
+		else
+			update_option( "acui_settings", "plugin" );
+	}
 ?>
 	
 <div class="wrap">
 	<h2><?php _e('Import User From CSV With Meta - SMTP server options', 'acui'); ?></h2>
-	<form method="post" action="">
+	<form method="post" action="" id="acui_smtp_options">
 		<?php wp_nonce_field('email-config'); ?>
+
+		<h3><?php _e('Global options', 'acui'); ?></h3>
+		<p><?php _e('Do you want to use your own SMTP settings for this plugin or the WordPress settings.', 'acui'); ?></p>
+
+		<table class="optiontable form-table">
+			<tr valign="top">
+				<th scope="row"><?php _e('Settings', 'acui'); ?> </th>
+				<td>
+					<fieldset>
+						<legend class="screen-reader-text"><span><?php _e('Use plugin SMTP settings', 'acui'); ?></span></legend>
+						<p><input id="acui_settings_plugin" type="radio" name="acui_settings" value="plugin" <?php checked('plugin', get_option('acui_settings')); ?> />
+						<label for="acui_settings"><?php _e('Use this settings to send mail.', 'acui'); ?></label></p>
+						<p><input id="acui_settings_wordpress" type="radio" name="acui_settings" value="wordpress" <?php checked('wordpress', get_option('acui_settings')); ?> />
+						<label for="acui_settings"><?php _e('Use WordPress general settings to send mail.', 'acui'); ?></label></p>
+					</fieldset>
+				</td>
+			</tr>
+		</table>
 
 		<table class="optiontable form-table">
 			<tr valign="top">
@@ -208,6 +235,35 @@ function acui_smtp() {
 		<p class="submit"><input type="submit" name="acui_smpt_action" id="acui_smpt_action" class="button-primary" value="<?php _e('Send Test', 'acui'); ?>" /></p>
 	</form>
 </div>
+
+<script>
+jQuery( document ).ready( function( $ ){
+	$( "[name='acui_settings']" ).on('change', function() {
+	   var selected = $( 'input[name=acui_settings]:checked' ).val();
+
+	   if( selected == "wordpress" )
+	   		disableControls();
+	   	else
+	   		enableControls();
+	});
+
+	function disableControls(){
+		$("#acui_smtp_options :input").prop("disabled", true);
+		$("[name='acui_settings']").prop("disabled", false);
+	}
+
+	function enableControls(){
+		$("#acui_smtp_options :input").prop("disabled", false);	
+	}
+
+	<?php if( get_option( "acui_settings" ) == "wordpress" ): ?>
+		disableControls();
+	<?php else: ?>
+		enableControls();
+	<?php endif; ?>
+})
+</script>
+
 	<?php
 }
 
@@ -227,7 +283,7 @@ function acui_mailer_init( PHPMailer $phpmailer ){
 	$phpmailer->SMTPSecure = get_option('acui_smtp_ssl') == 'none' ? '' : get_option('acui_smtp_ssl');
 	
 	// If we're sending via SMTP, set the host
-	if (get_option('mailer') == "smtp") {
+	if (get_option('acui_mailer') == "smtp") {
 		
 		// Set the SMTPSecure value, if set to none, leave this blank
 		$phpmailer->SMTPSecure = get_option('acui_smtp_ssl') == 'none' ? '' : get_option('acui_smtp_ssl');

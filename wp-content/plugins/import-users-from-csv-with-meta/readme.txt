@@ -4,7 +4,7 @@ Donate link: http://paypal.me/codection
 Tags: csv, import, importer, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert
 Requires at least: 3.4
 Tested up to: 4.4.2
-Stable tag: 1.8.5
+Stable tag: 1.8.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,8 +71,20 @@ Plugin will automatically detect:
 
 == Changelog ==
 
+= 1.8.7.2 =
+*	Bug in delete_user_meta solved thanks for telling us lizzy2surge
+
+= 1.8.7.1 =
+*	Bug in HTML mails solved
+
+= 1.8.7 =
+*	You can choose between plugin mail settings or WordPress mail settings, thanks to Awaken Solutions web design (http://www.awakensolutions.com/)
+
+= 1.8.6 =
+*	Bug detected in mailer settings, thanks to Carlos (satrebil@gmail.com)
+
 = 1.8.5 =
-*	Include order changed, after BuddyPress adaptations we break the SMTP settings when activating
+*	Include code changed, after BuddyPress adaptations we break the SMTP settings when activating
 
 = 1.8.4 =
 *	Labels for mail sending were creating some misunderstandings, we have changed it
